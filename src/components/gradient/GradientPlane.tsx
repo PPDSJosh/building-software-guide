@@ -90,17 +90,11 @@ export const EDITORIAL_DRIFT: GradientAnimationConfig = {
   intensity: 60,
 }
 
-const MAX_INIT_RETRIES = 30
-const INIT_RETRY_BASE_DELAY = 25
-const MAX_INIT_RETRY_DELAY = 200
-const STRICT_MODE_THRESHOLD_MS = 100
-
 /**
  * GradientPlane — renders a live WebGL gradient using the GradientLab engine.
  *
- * This component creates a canvas element, initializes a GradientEngine,
- * applies the provided gradient state (including warps, materials, effects),
- * and optionally runs an ambient animation loop.
+ * Canvas is rendered directly in JSX (matching GradientLab's LiveGradient pattern)
+ * so the browser computes layout dimensions before the engine initializes.
  *
  * Usage:
  * ```tsx
@@ -121,8 +115,7 @@ export function GradientPlane({
   pooled = true,
 }: GradientPlaneProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const poolRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<GradientEngine | null>(null)
   const animationFrameRef = useRef<number | null>(null)
   const mountedRef = useRef(true)
@@ -137,7 +130,7 @@ export function GradientPlane({
   const prefersReduced = useReducedMotion()
 
   // Engine pooling — only active instances get WebGL rendering
-  const isPoolActive = useGradientPool(poolRef)
+  const isPoolActive = useGradientPool(containerRef)
   const shouldRender = !pooled || isPoolActive
 
   // Disable animation loop when user prefers reduced motion
@@ -157,53 +150,24 @@ export function GradientPlane({
         try { engineRef.current.dispose() } catch { /* ignore */ }
         engineRef.current = null
       }
-      if (canvasRef.current && containerRef.current?.contains(canvasRef.current)) {
-        containerRef.current.removeChild(canvasRef.current)
-      }
-      canvasRef.current = null
       setIsLoaded(false)
       return
     }
 
     // shouldRender is true — initialize engine
+    const canvas = canvasRef.current
+    const container = containerRef.current
+    if (!canvas || !container) return
+
     mountedRef.current = true
-    const mountTime = Date.now()
     let isCleanedUp = false
-    let retryTimeoutId: number | null = null
+    let initTimeoutId: ReturnType<typeof setTimeout> | null = null
     let resizeObserver: ResizeObserver | undefined
 
-    // Create canvas element
-    const canvas = document.createElement('canvas')
-    canvas.style.width = '100%'
-    canvas.style.height = '100%'
-    canvas.style.position = 'absolute'
-    canvas.style.inset = '0'
-    canvas.style.display = 'block'
-    canvasRef.current = canvas
-
-    if (containerRef.current) {
-      containerRef.current.appendChild(canvas)
-    }
-
-    const initializeEngine = (attempt: number): boolean => {
-      if (isCleanedUp || !mountedRef.current || !canvas) return false
-      try {
-        if (!engineRef.current) {
-          engineRef.current = new GradientEngine(canvas)
-        }
-        return true
-      } catch (error) {
-        if (attempt === 0) {
-          console.warn('[GradientPlane] WebGL init failed, will retry:', error)
-        }
-        return false
-      }
-    }
-
     const updateSize = () => {
-      if (!containerRef.current || !engineRef.current || isCleanedUp) return
+      if (!container || !engineRef.current || isCleanedUp) return
       try {
-        const rect = containerRef.current.getBoundingClientRect()
+        const rect = container.getBoundingClientRect()
         if (rect.width > 0 && rect.height > 0) {
           engineRef.current.handleResize(Math.floor(rect.width), Math.floor(rect.height))
           engineRef.current.render()
@@ -213,93 +177,80 @@ export function GradientPlane({
       }
     }
 
-    const initializeWithRetry = (attempts = 0) => {
+    const tryInit = (attempt: number) => {
       if (isCleanedUp || !mountedRef.current) return
 
-      const success = initializeEngine(attempts)
-      if (!success && attempts < MAX_INIT_RETRIES) {
-        const delay = Math.min(INIT_RETRY_BASE_DELAY * Math.pow(1.2, attempts), MAX_INIT_RETRY_DELAY)
-        retryTimeoutId = window.setTimeout(() => initializeWithRetry(attempts + 1), delay)
-        return
-      }
-      if (!success) {
-        if (mountedRef.current) setWebglFailed(true)
-        return
-      }
-
-      if (!containerRef.current) {
-        if (attempts < MAX_INIT_RETRIES) {
-          const delay = Math.min(INIT_RETRY_BASE_DELAY * Math.pow(1.2, attempts), MAX_INIT_RETRY_DELAY)
-          retryTimeoutId = window.setTimeout(() => initializeWithRetry(attempts + 1), delay)
+      const rect = container.getBoundingClientRect()
+      if (rect.width === 0 || rect.height === 0) {
+        if (attempt < 30) {
+          initTimeoutId = setTimeout(() => tryInit(attempt + 1), Math.min(25 * Math.pow(1.2, attempt), 200))
         }
         return
       }
-
-      const rect = containerRef.current.getBoundingClientRect()
-      const width = Math.max(rect.width || 800, 1)
-      const height = Math.max(rect.height || 600, 1)
-
-      canvas.width = width
-      canvas.height = height
-
-      updateSize()
 
       try {
-        if (engineRef.current) {
-          applyFullStateToEngine(engineRef.current, preset)
-          baselineAngle.current = preset.angle ?? 0
-          baselineScale.current = 1.0
-          baselineCenterX.current = 50
-          baselineCenterY.current = 50
-          engineRef.current.render()
-
-          if (mountedRef.current) {
-            setIsLoaded(true)
-          }
-
-          // Ensure render catches up
-          const ensureRender = () => {
-            if (isCleanedUp || !engineRef.current) return
-            updateSize()
-            engineRef.current.render()
-          }
-          setTimeout(ensureRender, 50)
-          setTimeout(ensureRender, 150)
+        // Create engine from the JSX canvas ref
+        if (!engineRef.current) {
+          engineRef.current = new GradientEngine(canvas)
         }
+
+        const width = Math.floor(rect.width)
+        const height = Math.floor(rect.height)
+
+        // Set canvas pixel dimensions
+        canvas.width = width
+        canvas.height = height
+
+        // Set size and apply state
+        engineRef.current.handleResize(width, height)
+        applyFullStateToEngine(engineRef.current, preset)
+        baselineAngle.current = preset.angle ?? 0
+        baselineScale.current = 1.0
+        baselineCenterX.current = 50
+        baselineCenterY.current = 50
+        engineRef.current.render()
+
+        if (mountedRef.current && !isCleanedUp) {
+          setIsLoaded(true)
+        }
+
+        // Multiple ensure-renders for reliability (matches GradientLab pattern)
+        const ensureRender = () => {
+          if (isCleanedUp || !engineRef.current) return
+          updateSize()
+          engineRef.current.render()
+        }
+        setTimeout(ensureRender, 50)
+        setTimeout(ensureRender, 100)
+        setTimeout(ensureRender, 200)
       } catch (error) {
-        console.warn('[GradientPlane] Initial render error:', error)
+        console.warn('[GradientPlane] WebGL init failed:', error)
+        if (mountedRef.current) setWebglFailed(true)
       }
     }
 
+    // Observe container for size changes
     resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(updateSize)
     })
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current)
-    }
+    resizeObserver.observe(container)
 
-    initializeWithRetry()
+    // Start init
+    tryInit(0)
     window.addEventListener('resize', updateSize)
 
     return () => {
       isCleanedUp = true
-      if (retryTimeoutId !== null) clearTimeout(retryTimeoutId)
+      mountedRef.current = false
+      if (initTimeoutId !== null) clearTimeout(initTimeoutId)
       window.removeEventListener('resize', updateSize)
       resizeObserver?.disconnect()
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
 
-      const cleanupTime = Date.now()
-      const isStrictModeCleanup = cleanupTime - mountTime < STRICT_MODE_THRESHOLD_MS
-
-      if (engineRef.current && !isStrictModeCleanup) {
+      if (engineRef.current) {
         try { engineRef.current.dispose() } catch { /* ignore */ }
         engineRef.current = null
       }
-
-      if (canvasRef.current && containerRef.current?.contains(canvasRef.current)) {
-        containerRef.current.removeChild(canvasRef.current)
-      }
-      canvasRef.current = null
     }
   }, [shouldRender]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -424,11 +375,23 @@ export function GradientPlane({
     }
   }, [isLoaded, shouldAnimate, animateFrame])
 
-  if (webglFailed || !shouldRender) {
+  if (webglFailed) {
     return (
       <div
-        ref={poolRef}
-        className={`relative overflow-hidden ${className}`}
+        ref={containerRef}
+        data-gradient-pool-id
+        className={`overflow-hidden ${className}`}
+        style={{ backgroundColor: fallbackColor, ...style }}
+      />
+    )
+  }
+
+  if (!shouldRender) {
+    return (
+      <div
+        ref={containerRef}
+        data-gradient-pool-id
+        className={`overflow-hidden ${className}`}
         style={{ backgroundColor: fallbackColor, ...style }}
       />
     )
@@ -436,18 +399,26 @@ export function GradientPlane({
 
   return (
     <div
-      ref={(node) => {
-        // Share ref between pool tracking and container
-        ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-        ;(poolRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-      }}
-      className={`relative overflow-hidden ${className}`}
+      ref={containerRef}
+      data-gradient-pool-id
+      className={`overflow-hidden ${className}`}
       style={{
         ...style,
-        opacity: isLoaded ? 1 : 0,
-        transition: 'opacity 0.5s ease',
-        willChange: shouldAnimate ? 'transform' : undefined,
+        backgroundColor: fallbackColor,
       }}
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          opacity: isLoaded ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+        }}
+      />
+    </div>
   )
 }

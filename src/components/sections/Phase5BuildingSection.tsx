@@ -183,6 +183,7 @@ export function Phase5BuildingSection() {
       {/* TAKEOVER: The most powerful prompt */}
       <Takeover
         id="most-powerful-prompt"
+        headingLevel="h2"
         displayFont="bt-super"
         lines={['The Most', 'Powerful', 'Prompt In', 'This Entire', 'Guide']}
         preset={BUILDING_GRADIENT}

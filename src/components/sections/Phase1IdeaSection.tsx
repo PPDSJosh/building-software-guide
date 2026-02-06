@@ -48,6 +48,7 @@ export function Phase1IdeaSection() {
       {/* TAKEOVER: The key technique */}
       <Takeover
         id="repeat-the-plan"
+        headingLevel="h2"
         displayFont="bt-super"
         lines={['Do Nothing', 'But Repeat', 'The Plan', 'Back To Me']}
         preset={PHASE1_IDEA_GRADIENT}

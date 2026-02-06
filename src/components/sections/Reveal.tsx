@@ -17,6 +17,8 @@ interface RevealProps {
   /** Override font size (default: clamp(32px, 7vw, 96px)) */
   fontSize?: string
   className?: string
+  /** Semantic heading level. Default: h2 */
+  headingLevel?: 'h2' | 'h3'
 }
 
 /**
@@ -35,7 +37,7 @@ interface RevealProps {
  * - Gradient expression: 2-3 stops from base family plus one neighbor
  * - Layout: Centered in wide or full-bleed zone
  */
-export function Reveal({ text, id, zone = 'wide', fontFamily, fontSize, className = '' }: RevealProps) {
+export function Reveal({ text, id, zone = 'wide', fontFamily, fontSize, className = '', headingLevel = 'h2' }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null)
   const prefersReduced = useReducedMotion()
 
@@ -74,18 +76,23 @@ export function Reveal({ text, id, zone = 'wide', fontFamily, fontSize, classNam
     >
       <GridContainer>
         <ContentZone zone={zone}>
-          <div ref={ref} className="text-center">
-            <p
-              style={{
-                fontFamily: fontFamily ?? 'var(--font-canela)',
-                fontWeight: fontFamily ? 400 : 100,
-                fontSize: fontSize ?? 'clamp(32px, 7vw, 96px)',
-                lineHeight: 1.1,
-              }}
-            >
-              {text}
-            </p>
-          </div>
+          {(() => {
+            const HeadingTag = headingLevel
+            return (
+              <div ref={ref} className="text-center">
+                <HeadingTag
+                  style={{
+                    fontFamily: fontFamily ?? 'var(--font-canela)',
+                    fontWeight: fontFamily ? 400 : 100,
+                    fontSize: fontSize ?? 'clamp(32px, 7vw, 96px)',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {text}
+                </HeadingTag>
+              </div>
+            )
+          })()}
         </ContentZone>
       </GridContainer>
     </section>

@@ -36,6 +36,7 @@ export function Phase3SpecSection() {
       {/* TAKEOVER: The weight of the spec */}
       <Takeover
         id="spec-is-the-bible"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['The Spec', 'Is The', 'Bible']}
         preset={PHASE3_SPEC_GRADIENT}
@@ -122,7 +123,8 @@ export function Phase3SpecSection() {
       {/* TAKEOVER: The devastating analogy */}
       <Takeover
         id="rooms-on-a-lot"
-        displayFont="tusker"
+        headingLevel="h2"
+        displayFont="bt-super"
         lines={['You Didn\'t', 'Build A', 'House. You', 'Just Put', 'Rooms On', 'A Lot.']}
         preset={PHASE3_SPEC_GRADIENT}
         animation={SUBTLE_BREATHE}
@@ -170,6 +172,7 @@ export function Phase3SpecSection() {
       {/* TAKEOVER: The directive */}
       <Takeover
         id="give-it-a-system"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Don\'t Let', 'Claude', 'Guess. Give', 'It A System.']}
         preset={PHASE3_SPEC_GRADIENT}

@@ -217,11 +217,12 @@ export function WhenThingsGoWrongSection() {
       {/* TAKEOVER: The emotional climax — "WALK AWAY." */}
       <Takeover
         id="walk-away"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Walk', 'Away.']}
         preset={COMFORT_GRADIENT}
         animation={SUBTLE_BREATHE}
-        fallbackColor="#DCA14C"
+        fallbackColor="#592D11"
       />
 
       {/* EDITORIAL: Recovery and future protection */}

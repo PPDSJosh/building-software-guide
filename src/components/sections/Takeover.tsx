@@ -29,6 +29,11 @@ interface TakeoverProps {
     className?: string
     fallbackColor?: string
   }>
+  /** If true, content starts visible (hero sections at top of page).
+   *  Only the release phase animates on scroll. */
+  startAssembled?: boolean
+  /** Semantic heading level for accessibility. Hero should be h1, others h2. */
+  headingLevel?: 'h1' | 'h2' | 'h3'
 }
 
 /**
@@ -77,6 +82,8 @@ export function Takeover({
   animation,
   fallbackColor,
   additionalPlanes = [],
+  startAssembled = false,
+  headingLevel,
 }: TakeoverProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const pinRef = useRef<HTMLDivElement>(null)
@@ -141,69 +148,77 @@ export function Takeover({
       },
     })
 
-    // === PHASE 1: APPROACH (0% → 20%) ===
-    // Background gradient fades in and scales up from 85%
-    if (bgPlane) {
-      tl.fromTo(
-        bgPlane,
-        { scale: 0.85, opacity: 0 },
-        { scale: 1, opacity: 1, ease: 'power2.inOut', duration: 0.2 },
-        0,
-      )
-    }
+    if (startAssembled) {
+      // Hero/first-visible: content starts assembled, no approach/assembly phases
+      if (bgPlane) gsap.set(bgPlane, { scale: 1, opacity: 1 })
+      fgPlanes.forEach((p) => gsap.set(p, { opacity: 1, scale: 1, xPercent: 0, yPercent: 0 }))
+      typeLines.forEach((l) => gsap.set(l, { opacity: 1, scale: 1, yPercent: 0 }))
+      if (subtitleEl) gsap.set(subtitleEl, { opacity: 0.8, yPercent: 0 })
+    } else {
+      // === PHASE 1: APPROACH (0% → 20%) ===
+      // Background gradient fades in and scales up from 85%
+      if (bgPlane) {
+        tl.fromTo(
+          bgPlane,
+          { scale: 0.85, opacity: 0 },
+          { scale: 1, opacity: 1, ease: 'power2.inOut', duration: 0.2 },
+          0,
+        )
+      }
 
-    // Additional foreground planes drift in from scattered positions
-    fgPlanes.forEach((plane, i) => {
-      const direction = i % 2 === 0 ? 1 : -1
-      tl.fromTo(
-        plane,
-        {
-          xPercent: direction * 30,
-          yPercent: -20 + i * 15,
-          scale: 0.7,
-          opacity: 0,
-        },
-        {
-          xPercent: 0,
-          yPercent: 0,
-          scale: 1,
-          opacity: 1,
-          ease: 'power2.inOut',
-          duration: 0.2,
-        },
-        0.02 + i * 0.02,
-      )
-    })
+      // Additional foreground planes drift in from scattered positions
+      fgPlanes.forEach((plane, i) => {
+        const direction = i % 2 === 0 ? 1 : -1
+        tl.fromTo(
+          plane,
+          {
+            xPercent: direction * 30,
+            yPercent: -20 + i * 15,
+            scale: 0.7,
+            opacity: 0,
+          },
+          {
+            xPercent: 0,
+            yPercent: 0,
+            scale: 1,
+            opacity: 1,
+            ease: 'power2.inOut',
+            duration: 0.2,
+          },
+          0.02 + i * 0.02,
+        )
+      })
 
-    // === PHASE 2: ASSEMBLY (20% → 50%) ===
-    // Type lines assemble — each arrives from a different y-offset
-    typeLines.forEach((line, i) => {
-      tl.fromTo(
-        line,
-        {
-          yPercent: 40 + i * 20,
-          opacity: 0,
-          scale: 0.9,
-        },
-        {
-          yPercent: 0,
-          opacity: 1,
-          scale: 1,
-          ease: 'power2.inOut',
-          duration: 0.25,
-        },
-        0.2 + i * 0.04,
-      )
-    })
+      // === PHASE 2: ASSEMBLY (20% → 50%) ===
+      // Type lines assemble — each arrives from a different y-offset
+      typeLines.forEach((line, i) => {
+        tl.fromTo(
+          line,
+          {
+            yPercent: 40 + i * 20,
+            opacity: 0,
+            scale: 0.9,
+          },
+          {
+            yPercent: 0,
+            opacity: 1,
+            scale: 1,
+            ease: 'power2.inOut',
+            duration: 0.25,
+          },
+          0.2 + i * 0.04,
+        )
+      })
 
-    // Subtitle floats in last
-    if (subtitleEl) {
-      tl.fromTo(
-        subtitleEl,
-        { yPercent: 30, opacity: 0 },
-        { yPercent: 0, opacity: 0.8, ease: 'power2.out', duration: 0.15 },
-        0.45,
-      )
+      // Subtitle floats in last
+      if (subtitleEl) {
+        tl.fromTo(
+          subtitleEl,
+          { yPercent: 30, opacity: 0 },
+          { yPercent: 0, opacity: 0.8, ease: 'power2.out', duration: 0.15 },
+          0.45,
+        )
+      }
     }
 
     // === PHASE 3: HOLD (50% → 75%) ===
@@ -349,22 +364,32 @@ export function Takeover({
 
         {/* Display type — foreground layer, 115% parallax speed */}
         <div className="relative z-10 text-center px-4">
-          {lines.map((line, i) => (
-            <div
-              key={i}
-              data-takeover-line={i}
-              className="uppercase"
-              style={{
-                fontFamily: fontStyle.fontFamily,
-                fontSize: 'clamp(48px, 12vw, 160px)',
-                letterSpacing: fontStyle.letterSpacing,
-                lineHeight: fontStyle.lineHeight,
-                color: 'var(--white)',
-              }}
-            >
-              {line}
-            </div>
-          ))}
+          {(() => {
+            const HeadingTag = headingLevel ?? 'div'
+            return (
+              <HeadingTag
+                style={{
+                  fontFamily: fontStyle.fontFamily,
+                  fontSize: 'clamp(48px, 15vw, 200px)',
+                  letterSpacing: fontStyle.letterSpacing,
+                  lineHeight: fontStyle.lineHeight,
+                  color: 'var(--white)',
+                  fontWeight: 'inherit',
+                }}
+                className={displayFont === 'bulevar' ? '' : 'uppercase'}
+              >
+                {lines.map((line, i) => (
+                  <span
+                    key={i}
+                    data-takeover-line={i}
+                    className="block"
+                  >
+                    {line}
+                  </span>
+                ))}
+              </HeadingTag>
+            )
+          })()}
 
           {subtitle && (
             <p

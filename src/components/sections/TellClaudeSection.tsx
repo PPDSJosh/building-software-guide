@@ -32,6 +32,7 @@ export function TellClaudeSection() {
       {/* TAKEOVER: The single most important sentence in the guide */}
       <Takeover
         id="tell-claude"
+        headingLevel="h2"
         displayFont="bt-super"
         lines={['Tell Claude', 'You Are Not', 'A Software', 'Engineer']}
         preset={TELL_CLAUDE_GRADIENT}

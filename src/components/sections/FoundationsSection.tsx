@@ -32,6 +32,7 @@ export function FoundationsSection() {
       {/* TAKEOVER: The core demystification */}
       <Takeover
         id="foundations"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Software Is', 'Code +', 'Database']}
         preset={FOUNDATIONS_GRADIENT}

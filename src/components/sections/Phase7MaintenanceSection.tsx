@@ -34,6 +34,7 @@ export function Phase7MaintenanceSection() {
       {/* TAKEOVER: The reframe */}
       <Takeover
         id="launching-is-not-the-end"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Launching', 'Is Not The', 'End. It\u2019s', 'Barely The', 'Beginning.']}
         preset={PHASE7_MAINTENANCE_GRADIENT}

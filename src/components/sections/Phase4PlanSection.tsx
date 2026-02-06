@@ -37,6 +37,7 @@ export function Phase4PlanSection() {
       {/* TAKEOVER: The distinction */}
       <Takeover
         id="spec-vs-plan"
+        headingLevel="h2"
         displayFont="bulevar"
         lines={['The Spec Is', 'The What.', 'The Plan Is', 'The How.']}
         preset={PHASE4_PLAN_GRADIENT}
@@ -199,6 +200,7 @@ export function Phase4PlanSection() {
       {/* TAKEOVER: The 70% Problem */}
       <Takeover
         id="seventy-percent"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['The First', '70% Is', 'Exhilarating.', 'The Last 30%', 'Is A Grind.']}
         preset={PHASE4_PLAN_GRADIENT}

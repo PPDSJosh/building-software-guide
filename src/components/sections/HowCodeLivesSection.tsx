@@ -210,6 +210,7 @@ export function HowCodeLivesSection() {
       {/* TAKEOVER: The revelation */}
       <Takeover
         id="how-code-lives"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Your', 'Codebase Is', 'Just A', 'Folder']}
         subtitle="That's it. That's the secret."
@@ -299,6 +300,7 @@ export function HowCodeLivesSection() {
       {/* TAKEOVER: Only You Can See It */}
       <Takeover
         id="only-you-can-see-it"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Only You', 'Can See It']}
         preset={HOW_CODE_LIVES_GRADIENT}

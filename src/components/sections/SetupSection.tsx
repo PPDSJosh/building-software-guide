@@ -107,6 +107,7 @@ export function SetupSection() {
       {/* TAKEOVER: Silence Is Success */}
       <Takeover
         id="silence-is-success"
+        headingLevel="h2"
         displayFont="bt-super"
         lines={['Silence', 'Is', 'Success']}
         preset={SETUP_GRADIENT}

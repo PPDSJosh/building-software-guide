@@ -183,6 +183,7 @@ export function ToolSections() {
       {/* TAKEOVER: The distillation */}
       <Takeover
         id="think-build-automate"
+        headingLevel="h2"
         displayFont="tusker"
         lines={['Think', 'Build', 'Automate']}
         preset={TOOLS_GRADIENT}

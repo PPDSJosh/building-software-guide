@@ -71,6 +71,7 @@ export function Section({ id, treatment, className = '', children }: SectionProp
     <section
       ref={sectionRef}
       id={id}
+      aria-label={id.replace(/-/g, ' ')}
       data-treatment={treatment}
       className={`${treatmentClasses[treatment]} ${className}`}
       style={{

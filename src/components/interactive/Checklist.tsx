@@ -69,7 +69,7 @@ export function Checklist({
           {title}
         </p>
       )}
-      <ul className="space-y-3">
+      <ul className="space-y-3" role="list" aria-label={title ?? 'Checklist'}>
         {items.map((item, i) => (
           <li
             key={i}

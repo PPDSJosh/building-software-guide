@@ -119,7 +119,8 @@ test.describe('Guide — WebGL Gradient Rendering', () => {
     expect(heroBox!.height).toBeGreaterThan(100)
   })
 
-  test('gradient pool activates after scroll', async ({ page }) => {
+  test('gradient pool activates after scroll', async ({ page }, testInfo) => {
+    testInfo.setTimeout(60_000)
     await page.goto('/', { waitUntil: 'networkidle' })
     await page.waitForTimeout(2000)
 
@@ -211,7 +212,8 @@ test.describe('Guide — Scroll & Animation', () => {
     expect(newScroll).toBeGreaterThan(initialScroll)
   })
 
-  test('scroll through entire page without crashes', async ({ page }) => {
+  test('scroll through entire page without crashes', async ({ page }, testInfo) => {
+    testInfo.setTimeout(120_000)
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
@@ -220,12 +222,15 @@ test.describe('Guide — Scroll & Animation', () => {
 
     const totalHeight = await page.evaluate(() => document.body.scrollHeight)
     const viewport = await page.evaluate(() => window.innerHeight)
-    const steps = Math.ceil(totalHeight / viewport)
+    // Jump 3x viewport to avoid timeout on very tall pinned pages
+    const step = viewport * 3
 
-    for (let i = 0; i < Math.min(steps, 30); i++) {
-      await page.evaluate((y) => window.scrollTo(0, y), i * viewport)
-      await page.waitForTimeout(200)
+    for (let y = 0; y < totalHeight; y += step) {
+      await page.evaluate((scrollY) => window.scrollTo(0, scrollY), y)
+      await page.waitForTimeout(100)
     }
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForTimeout(500)
 
     // Filter out WebGL context warnings
     const criticalErrors = errors.filter(

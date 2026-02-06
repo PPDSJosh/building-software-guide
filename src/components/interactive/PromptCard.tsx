@@ -67,7 +67,7 @@ export function PromptCard({
   }, [])
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} role="figure" aria-label={label ?? 'Prompt'}>
       {label && (
         <p
           className="text-xs uppercase tracking-widest mb-3 opacity-50"

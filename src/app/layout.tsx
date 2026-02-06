@@ -15,8 +15,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <a
+          href="#hero"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded"
+        >
+          Skip to content
+        </a>
         <ChromeBar />
         <main
+          role="main"
           className="relative"
           style={{ paddingTop: 'var(--chrome-height)' }}
         >

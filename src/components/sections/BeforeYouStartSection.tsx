@@ -122,6 +122,7 @@ export function BeforeYouStartSection() {
       {/* TAKEOVER: Threshold moment — entering the phases */}
       <Takeover
         id="now-build"
+        headingLevel="h2"
         displayFont="bulevar"
         lines={['Now', 'Build.']}
         preset={BEFORE_YOU_START_GRADIENT}

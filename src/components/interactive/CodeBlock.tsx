@@ -89,6 +89,8 @@ export function CodeBlock({
         }}
       >
         <pre
+          role="region"
+          aria-label={language ? `${language} code example` : 'Code example'}
           className="overflow-x-auto"
           style={{
             padding: '24px 28px',

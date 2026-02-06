@@ -42,6 +42,8 @@ export default function Home() {
         preset={HERO_GRADIENT}
         animation={DRAMATIC_BREATHE}
         fallbackColor="#592D11"
+        startAssembled
+        headingLevel="h1"
         additionalPlanes={[
           {
             preset: HERO_STAGE_MID,
