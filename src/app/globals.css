@@ -1,0 +1,341 @@
+@import "tailwindcss";
+
+/* ============================================
+   FONT FACE DECLARATIONS
+   ============================================ */
+
+@font-face {
+  font-family: 'Tusker Grotesk';
+  src: url('/fonts/TuskerGrotesk-3800Super.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BT Super Eighty';
+  src: url('/fonts/FontsFree-Net-BTSuperEighty.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bulevar Poster';
+  src: url('/fonts/Bulevar-Poster.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bulevar';
+  src: url('/fonts/Bulevar-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Canela';
+  src: url('/fonts/Canela-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Miju';
+  src: url('/fonts/Miju.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
+   DESIGN TOKENS — CSS CUSTOM PROPERTIES
+   ============================================ */
+
+:root {
+  /* === Neutral Foundation === */
+  --night: #090D10;
+  --black: #000000;
+  --middle-gray: #969696;
+  --light-gray: #F9F9F9;
+  --white: #FFFFFF;
+
+  /* === Gold / Amber Family === */
+  --gold-deepest: #592D11;
+  --gold-dark: #E38227;
+  --gold-mid: #F9A223;
+  --gold-bright: #DCA14C;
+  --gold-light: #FEF2E2;
+  --gold-text: #F7D8AB;
+
+  /* === Blue / Purple Family === */
+  --blue-deepest: #150B49;
+  --blue-dark: #1B0C6F;
+  --blue-dark-alt: #480C79;
+  --blue-mid: #3500FF;
+  --blue-bright: #8C00FF;
+  --blue-light: #EEEBFF;
+  --blue-light-alt: #E4C7FC;
+  --blue-electric: #FF00D4;
+
+  /* === Green Family === */
+  --green-deepest: #091410;
+  --green-dark: #142819;
+  --green-dark-alt: #002F26;
+  --green-mid: #1E7C40;
+  --green-bright: #78DB89;
+  --green-neighbor: #006653;
+
+  /* === Teal Family === */
+  --teal-deepest: #122526;
+  --teal-dark: #1C3C3D;
+  --teal-mid: #41AAAE;
+  --teal-bright: #73CBC4;
+  --teal-electric: #00FFC5;
+
+  /* === Red / Crimson Family === */
+  --red-deepest: #680300;
+  --red-dark: #8F0300;
+  --red-mid: #F5241F;
+  --red-light: #FFDCDB;
+  --red-warm-gray: #7C7070;
+
+  /* === Accent Colors === */
+  --accent-magenta: #FF00D4;
+  --accent-peach: #F7D8AB;
+  --accent-warm-gray: #7C7070;
+
+  /* === Spacing Scale (8px grid) === */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-12: 96px;
+  --space-16: 128px;
+
+  /* === Grid === */
+  --grid-columns: 12;
+  --grid-max-width: 1400px;
+  --grid-gutter: 24px;
+  --grid-outer-margin: 48px;
+
+  /* === Content Zones === */
+  --narrow-cols: 6;
+  --medium-cols: 8;
+  --wide-cols: 10;
+
+  /* === Typography === */
+  --body-size: 22px;
+  --body-line-height: 1.65;
+  --body-max-width: 680px;
+  --secondary-size: 17px;
+  --secondary-line-height: 1.5;
+  --code-size: 17px;
+  --code-line-height: 1.55;
+
+  /* === Chrome Bar === */
+  --chrome-height: 40px;
+  --chrome-bg: var(--night);
+  --chrome-text: var(--gold-mid);
+}
+
+/* === Responsive Overrides === */
+@media (max-width: 1199px) {
+  :root {
+    --grid-gutter: 16px;
+    --grid-outer-margin: 32px;
+    --body-size: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --grid-gutter: 12px;
+    --grid-outer-margin: 20px;
+    --body-size: 18px;
+    --chrome-height: 32px;
+  }
+}
+
+/* ============================================
+   TAILWIND THEME EXTENSION
+   ============================================ */
+
+@theme inline {
+  /* Colors */
+  --color-night: var(--night);
+  --color-middle-gray: var(--middle-gray);
+  --color-light-gray: var(--light-gray);
+
+  --color-gold-deepest: var(--gold-deepest);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-mid: var(--gold-mid);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-light: var(--gold-light);
+  --color-gold-text: var(--gold-text);
+
+  --color-blue-deepest: var(--blue-deepest);
+  --color-blue-dark: var(--blue-dark);
+  --color-blue-dark-alt: var(--blue-dark-alt);
+  --color-blue-mid: var(--blue-mid);
+  --color-blue-bright: var(--blue-bright);
+  --color-blue-light: var(--blue-light);
+  --color-blue-light-alt: var(--blue-light-alt);
+
+  --color-green-deepest: var(--green-deepest);
+  --color-green-dark: var(--green-dark);
+  --color-green-dark-alt: var(--green-dark-alt);
+  --color-green-mid: var(--green-mid);
+  --color-green-bright: var(--green-bright);
+  --color-green-neighbor: var(--green-neighbor);
+
+  --color-teal-deepest: var(--teal-deepest);
+  --color-teal-dark: var(--teal-dark);
+  --color-teal-mid: var(--teal-mid);
+  --color-teal-bright: var(--teal-bright);
+  --color-teal-electric: var(--teal-electric);
+
+  --color-red-deepest: var(--red-deepest);
+  --color-red-dark: var(--red-dark);
+  --color-red-mid: var(--red-mid);
+  --color-red-light: var(--red-light);
+
+  --color-accent-magenta: var(--accent-magenta);
+  --color-accent-peach: var(--accent-peach);
+
+  /* Fonts */
+  --font-tusker: 'Tusker Grotesk', sans-serif;
+  --font-bt-super: 'BT Super Eighty', sans-serif;
+  --font-bulevar-poster: 'Bulevar Poster', serif;
+  --font-bulevar: 'Bulevar', serif;
+  --font-canela: 'Canela', serif;
+  --font-body: 'PP Neue Montreal', sans-serif;
+  --font-miju: 'Miju', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-26: 6.5rem;
+  --spacing-30: 7.5rem;
+
+  /* Max Widths */
+  --container-grid: var(--grid-max-width);
+  --container-narrow: 680px;
+  --container-medium: 920px;
+  --container-wide: 1160px;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto; /* GSAP handles scroll, not CSS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--night);
+  color: var(--white);
+  font-family: 'PP Neue Montreal', sans-serif;
+  font-size: var(--body-size);
+  line-height: var(--body-line-height);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Inline Code === */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.06);
+  word-break: break-all;
+}
+
+/* === Selection === */
+::selection {
+  background-color: var(--gold-mid);
+  color: var(--night);
+}
+
+/* === Scrollbar (subtle) === */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--night);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--middle-gray);
+  border-radius: 3px;
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
