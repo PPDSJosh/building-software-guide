@@ -148,92 +148,66 @@ export function Takeover({
       },
     })
 
-    if (startAssembled) {
-      // Hero/first-visible: content starts assembled, no approach/assembly phases
-      if (bgPlane) gsap.set(bgPlane, { scale: 1, opacity: 1 })
-      fgPlanes.forEach((p) => gsap.set(p, { opacity: 1, scale: 1, xPercent: 0, yPercent: 0 }))
-      typeLines.forEach((l) => gsap.set(l, { opacity: 1, scale: 1, yPercent: 0 }))
-      if (subtitleEl) gsap.set(subtitleEl, { opacity: 0.8, yPercent: 0 })
-    } else {
-      // === PHASE 1: APPROACH (0% → 20%) ===
-      // Background gradient fades in and scales up from 85%
-      if (bgPlane) {
-        tl.fromTo(
-          bgPlane,
-          { scale: 0.85, opacity: 0 },
-          { scale: 1, opacity: 1, ease: 'power2.inOut', duration: 0.2 },
-          0,
-        )
-      }
+    // === ALL CONTENT STARTS VISIBLE ===
+    // Elements are assembled on arrival — no invisible-start scrub animations.
+    // This guarantees content is never a black screen at any scroll position.
+    if (bgPlane) gsap.set(bgPlane, { scale: 1, opacity: 1 })
+    fgPlanes.forEach((p) => gsap.set(p, { opacity: 1, scale: 1, xPercent: 0, yPercent: 0 }))
+    typeLines.forEach((l) => gsap.set(l, { opacity: 1, scale: 1, yPercent: 0 }))
+    if (subtitleEl) gsap.set(subtitleEl, { opacity: 0.8, yPercent: 0 })
 
-      // Additional foreground planes drift in from scattered positions
-      fgPlanes.forEach((plane, i) => {
-        const direction = i % 2 === 0 ? 1 : -1
-        tl.fromTo(
-          plane,
-          {
-            xPercent: direction * 30,
-            yPercent: -20 + i * 15,
-            scale: 0.7,
-            opacity: 0,
-          },
-          {
-            xPercent: 0,
-            yPercent: 0,
-            scale: 1,
-            opacity: 1,
-            ease: 'power2.inOut',
-            duration: 0.2,
-          },
-          0.02 + i * 0.02,
-        )
+    // === TRIGGERED ENTRANCE (non-hero only) ===
+    // Fast, non-scrub animation when section enters viewport — gives approach/assembly feel.
+    if (!startAssembled) {
+      // Set subtle starting offsets (NOT invisible — just slightly offset)
+      if (bgPlane) gsap.set(bgPlane, { scale: 0.97 })
+      typeLines.forEach((l, i) => gsap.set(l, { yPercent: 8 + i * 3, opacity: 0.7 }))
+      fgPlanes.forEach((p, i) => {
+        const dir = i % 2 === 0 ? 1 : -1
+        gsap.set(p, { xPercent: dir * 5, scale: 0.95 })
       })
+      if (subtitleEl) gsap.set(subtitleEl, { opacity: 0, yPercent: 10 })
 
-      // === PHASE 2: ASSEMBLY (20% → 50%) ===
-      // Type lines assemble — each arrives from a different y-offset
-      typeLines.forEach((line, i) => {
-        tl.fromTo(
-          line,
-          {
-            yPercent: 40 + i * 20,
-            opacity: 0,
-            scale: 0.9,
-          },
-          {
-            yPercent: 0,
-            opacity: 1,
-            scale: 1,
-            ease: 'power2.inOut',
-            duration: 0.25,
-          },
-          0.2 + i * 0.04,
-        )
+      ScrollTrigger.create({
+        trigger: container,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          // Fast entrance — 0.6-0.8s
+          if (bgPlane) {
+            gsap.to(bgPlane, { scale: 1, ease: 'power2.out', duration: 0.8 })
+          }
+          typeLines.forEach((l, i) => {
+            gsap.to(l, {
+              yPercent: 0, opacity: 1, ease: 'power2.out',
+              duration: 0.6, delay: 0.05 * i,
+            })
+          })
+          fgPlanes.forEach((p, i) => {
+            gsap.to(p, {
+              xPercent: 0, scale: 1, ease: 'power2.out',
+              duration: 0.7, delay: 0.03 * i,
+            })
+          })
+          if (subtitleEl) {
+            gsap.to(subtitleEl, { opacity: 0.8, yPercent: 0, ease: 'power2.out', duration: 0.5, delay: 0.2 })
+          }
+        },
       })
-
-      // Subtitle floats in last
-      if (subtitleEl) {
-        tl.fromTo(
-          subtitleEl,
-          { yPercent: 30, opacity: 0 },
-          { yPercent: 0, opacity: 0.8, ease: 'power2.out', duration: 0.15 },
-          0.45,
-        )
-      }
     }
 
-    // === PHASE 3: HOLD (50% → 75%) ===
-    // Composition is assembled. Minimal motion — just ambient gradient breathing.
-    // We add a tiny scale breathe to keep it alive.
+    // === HOLD (0% → 60%) ===
+    // Composition is assembled. Subtle ambient breathing via scale.
     if (bgPlane) {
       tl.to(
         bgPlane,
-        { scale: 1.02, ease: 'sine.inOut', duration: 0.25 },
-        0.5,
+        { scale: 1.03, ease: 'sine.inOut', duration: 0.6 },
+        0,
       )
     }
 
-    // === PHASE 4: RELEASE (75% → 100%) ===
-    // Layers separate — foreground faster, background slower
+    // === RELEASE (60% → 100%) ===
+    // Layers separate — foreground faster, background slower.
     typeLines.forEach((line, i) => {
       tl.to(
         line,
@@ -241,17 +215,17 @@ export function Takeover({
           yPercent: -30 - i * 10,
           opacity: 0,
           ease: 'power2.inOut',
-          duration: 0.2,
+          duration: 0.25,
         },
-        0.75 + i * 0.02,
+        0.6 + i * 0.03,
       )
     })
 
     if (subtitleEl) {
       tl.to(
         subtitleEl,
-        { yPercent: -20, opacity: 0, ease: 'power2.in', duration: 0.15 },
-        0.78,
+        { yPercent: -20, opacity: 0, ease: 'power2.in', duration: 0.2 },
+        0.65,
       )
     }
 
@@ -264,9 +238,9 @@ export function Takeover({
           xPercent: direction * 20,
           opacity: 0,
           ease: 'power2.inOut',
-          duration: 0.2,
+          duration: 0.25,
         },
-        0.8 + i * 0.02,
+        0.7 + i * 0.03,
       )
     })
 
@@ -274,7 +248,7 @@ export function Takeover({
       tl.to(
         bgPlane,
         { scale: 1.1, opacity: 0, ease: 'power2.inOut', duration: 0.2 },
-        0.85,
+        0.8,
       )
     }
 
